@@ -6,11 +6,18 @@ BASE_DIR = Path(__file__).resolve().parent
 load_dotenv(BASE_DIR / ".env")
 
 
+def _get_int_env(var_name: str, default: int) -> int:
+    val = os.getenv(var_name)
+    if val and val.strip().isdigit():
+        return int(val.strip())
+    return default
+
+
 class Config:
     """Base application configuration."""
-    SECRET_KEY = os.getenv("SECRET_KEY", "mailshield-default-dev-secret-key-academic-2026")
+    SECRET_KEY = os.getenv("SECRET_KEY") or "mailshield-default-dev-secret-key-academic-2026"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    MAX_CONTENT_LENGTH = int(os.getenv("MAX_CONTENT_LENGTH", 16 * 1024 * 1024))  # 16 MB max body
+    MAX_CONTENT_LENGTH = _get_int_env("MAX_CONTENT_LENGTH", 16 * 1024 * 1024)  # 16 MB max body
     
     # Model and artifact paths
     MODELS_DIR = BASE_DIR / "models"
@@ -19,13 +26,13 @@ class Config:
     
     # Security headers & cookies
     SESSION_COOKIE_HTTPONLY = True
-    SESSION_COOKIE_SAMESITE = os.getenv("SESSION_COOKIE_SAMESITE", "Lax")
-    SESSION_COOKIE_SECURE = os.getenv("SESSION_COOKIE_SECURE", "False").lower() in ("true", "1", "t")
+    SESSION_COOKIE_SAMESITE = os.getenv("SESSION_COOKIE_SAMESITE") or "Lax"
+    SESSION_COOKIE_SECURE = (os.getenv("SESSION_COOKIE_SECURE") or "False").lower() in ("true", "1", "t")
 
     # Optional Threat Intelligence keys
-    VIRUSTOTAL_API_KEY = os.getenv("VIRUSTOTAL_API_KEY", "")
-    GOOGLE_SAFE_BROWSING_API_KEY = os.getenv("GOOGLE_SAFE_BROWSING_API_KEY", "")
-    ABUSEIPDB_API_KEY = os.getenv("ABUSEIPDB_API_KEY", "")
+    VIRUSTOTAL_API_KEY = os.getenv("VIRUSTOTAL_API_KEY") or ""
+    GOOGLE_SAFE_BROWSING_API_KEY = os.getenv("GOOGLE_SAFE_BROWSING_API_KEY") or ""
+    ABUSEIPDB_API_KEY = os.getenv("ABUSEIPDB_API_KEY") or ""
 
 
 class DevelopmentConfig(Config):
@@ -53,7 +60,6 @@ class ProductionConfig(Config):
             SQLALCHEMY_DATABASE_URI = f"sqlite:///{BASE_DIR / 'instance' / 'mailshield.db'}"
     else:
         SQLALCHEMY_DATABASE_URI = database_url
-
 
 
 class TestingConfig(Config):
