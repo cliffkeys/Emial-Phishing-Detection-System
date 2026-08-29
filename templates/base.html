@@ -1,141 +1,271 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}MailShield – Email Threat Detection System{% endblock %}</title>
-    
-    <!-- Google Fonts: Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <title>{% block title %}MailShield – Email Spam & Phishing Detector{% endblock %}</title>
 
-    <!-- Bootstrap 5 CSS -->
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- FontAwesome 6 -->
+    <!-- FontAwesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-    <!-- Custom Cyber Theme CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --bg: #0d0f14;
+            --surface: #13161d;
+            --border: #1e2330;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --text: #f1f5f9;
+            --muted: #64748b;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --success: #22c55e;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ── NAV ── */
+        .topnav {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0.85rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .topnav .brand {
+            font-weight: 800;
+            font-size: 1.15rem;
+            color: var(--text);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .topnav .brand i {
+            color: var(--accent);
+            font-size: 1.3rem;
+        }
+        .topnav .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        .topnav .nav-links a {
+            color: var(--muted);
+            text-decoration: none;
+            padding: 0.45rem 0.85rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.15s;
+        }
+        .topnav .nav-links a:hover,
+        .topnav .nav-links a.active {
+            background: var(--border);
+            color: var(--text);
+        }
+        .topnav .nav-links a.btn-scan {
+            background: var(--accent);
+            color: #fff;
+            font-weight: 600;
+        }
+        .topnav .nav-links a.btn-scan:hover {
+            background: var(--accent-hover);
+        }
+
+        /* mobile hamburger */
+        .hamburger {
+            display: none;
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 0.4rem 0.6rem;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        @media (max-width: 640px) {
+            .hamburger { display: block; }
+            .nav-links { display: none; flex-direction: column; position: absolute; top: 60px; left: 0; right: 0; background: var(--surface); border-bottom: 1px solid var(--border); padding: 1rem; gap: 0.5rem; z-index: 99; }
+            .nav-links.open { display: flex; }
+            .nav-links a { width: 100%; text-align: center; }
+        }
+
+        /* ── FLASH ── */
+        .flash-wrap { padding: 0.75rem 1.5rem 0; }
+        .flash-msg {
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        .flash-success { background: #14532d33; border: 1px solid #22c55e55; color: #86efac; }
+        .flash-danger  { background: #7f1d1d33; border: 1px solid #ef444455; color: #fca5a5; }
+        .flash-warning { background: #78350f33; border: 1px solid #f59e0b55; color: #fde68a; }
+        .flash-info    { background: #1e3a5f33; border: 1px solid #3b82f655; color: #93c5fd; }
+
+        /* ── MAIN ── */
+        main { flex: 1; }
+
+        /* ── CARD ── */
+        .card-box {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 1.25rem 1.5rem;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--muted);
+        }
+
+        /* ── FORM ── */
+        .form-control, .form-select {
+            background: #0d0f14;
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 10px;
+        }
+        .form-control:focus, .form-select:focus {
+            background: #0d0f14;
+            border-color: var(--accent);
+            color: var(--text);
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+        }
+        .form-label { font-size: 0.875rem; font-weight: 600; color: var(--muted); margin-bottom: 0.4rem; }
+
+        /* ── BUTTONS ── */
+        .btn-primary {
+            background: var(--accent) !important;
+            border-color: var(--accent) !important;
+            color: #fff !important;
+            font-weight: 600;
+            border-radius: 10px;
+        }
+        .btn-primary:hover { background: var(--accent-hover) !important; border-color: var(--accent-hover) !important; }
+        .btn-secondary-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--muted);
+            font-weight: 500;
+            border-radius: 10px;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: all 0.15s;
+        }
+        .btn-secondary-outline:hover { border-color: var(--accent); color: var(--text); }
+
+        /* ── VERDICT BADGES ── */
+        .verdict-phishing { color: var(--danger); }
+        .verdict-spam     { color: var(--warning); }
+        .verdict-suspicious { color: #f97316; }
+        .verdict-safe     { color: var(--success); }
+
+        /* ── PROGRESS ── */
+        .progress { background: var(--border); border-radius: 999px; }
+        .progress-bar { border-radius: 999px; }
+
+        /* ── TABLES ── */
+        .table { color: var(--text); }
+        .table th { color: var(--muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; border-color: var(--border); font-weight: 600; }
+        .table td { border-color: var(--border); font-size: 0.875rem; vertical-align: middle; }
+        .table-hover tbody tr:hover { background: rgba(255,255,255,0.03); }
+
+        /* ── MISC UTILS ── */
+        .text-muted-custom { color: var(--muted); }
+        .section-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+        code { background: var(--border); color: #93c5fd; padding: 0.15em 0.4em; border-radius: 5px; font-size: 0.875em; }
+    </style>
 
     {% block extra_head %}{% endblock %}
 </head>
 <body>
-    <!-- Top Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-mailshield sticky-top">
-        <div class="container-fluid px-lg-4">
-            <a class="navbar-brand d-flex align-items-center gap-2" href="{{ url_for('index') }}">
-                <div class="brand-badge"><i class="fa-solid fa-shield-halved"></i> MAILSHIELD</div>
-                <span class="text-secondary small d-none d-md-inline fw-semibold">| Threat Detection System</span>
+
+<!-- TOP NAV -->
+<nav class="topnav">
+    <a class="brand" href="{{ url_for('index') }}">
+        <i class="fa-solid fa-shield-halved"></i> MailShield
+    </a>
+
+    <button class="hamburger" onclick="this.nextElementSibling.classList.toggle('open')">
+        <i class="fa-solid fa-bars"></i>
+    </button>
+
+    <div class="nav-links">
+        {% if current_user.is_authenticated %}
+            <a href="{{ url_for('analyze') }}" class="btn-scan">
+                <i class="fa-solid fa-magnifying-glass me-1"></i> Scan Email
             </a>
-            
-            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
-                <i class="fa-solid fa-bars text-white"></i>
-            </button>
-
-            <div class="collapse navbar-collapse" id="navbarMain">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3">
-                    {% if current_user.is_authenticated %}
-                        <li class="nav-item">
-                            <a class="nav-link text-light px-3" href="{{ url_for('dashboard') }}"><i class="fa-solid fa-gauge-high me-1 text-primary"></i> Dashboard</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-light px-3" href="{{ url_for('analyze') }}"><i class="fa-solid fa-envelope-open-text me-1 text-info"></i> Analyze Email</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-light px-3" href="{{ url_for('history') }}"><i class="fa-solid fa-clock-rotate-left me-1 text-warning"></i> History</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-light px-3" href="{{ url_for('evaluation') }}"><i class="fa-solid fa-brain me-1 text-success"></i> ML Metrics</a>
-                        </li>
-                    {% endif %}
-                    <li class="nav-item">
-                        <a class="nav-link text-light px-3" href="{{ url_for('about') }}"><i class="fa-solid fa-circle-info me-1 text-secondary"></i> About & Architecture</a>
-                    </li>
-                    {% if is_admin %}
-                        <li class="nav-item">
-                            <a class="nav-link text-warning px-3" href="{{ url_for('admin_dashboard') }}"><i class="fa-solid fa-shield-virus me-1"></i> Admin Panel</a>
-                        </li>
-                    {% endif %}
-                </ul>
-
-                <ul class="navbar-nav ms-auto align-items-lg-center">
-                    {% if current_user.is_authenticated %}
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle text-light d-flex align-items-center gap-2" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                                    <i class="fa-solid fa-user-shield fa-sm"></i>
-                                </div>
-                                <span>{{ current_user.username }}</span>
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end ms-card border-secondary">
-                                <li class="dropdown-header text-secondary small">Logged in as <b>{{ current_user.username }}</b></li>
-                                <li><hr class="dropdown-divider border-secondary"></li>
-                                <li><a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}"><i class="fa-solid fa-right-from-bracket me-2"></i> Log Out</a></li>
-                            </ul>
-                        </li>
-                    {% else %}
-                        <li class="nav-item me-2">
-                            <a class="btn btn-outline-secondary btn-sm px-3" href="{{ url_for('auth.login') }}"><i class="fa-solid fa-arrow-right-to-bracket me-1"></i> Sign In</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="btn btn-primary btn-sm px-3" href="{{ url_for('auth.register') }}"><i class="fa-solid fa-user-plus me-1"></i> Register</a>
-                        </li>
-                    {% endif %}
-                </ul>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Flash Messages Container -->
-    <div class="container-fluid px-lg-4 mt-3">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show ms-card border-0 shadow-sm" role="alert">
-                        <div class="d-flex align-items-center gap-2">
-                            {% if category == 'success' %}
-                                <i class="fa-solid fa-circle-check text-success fs-5"></i>
-                            {% elif category == 'danger' %}
-                                <i class="fa-solid fa-triangle-exclamation text-danger fs-5"></i>
-                            {% elif category == 'warning' %}
-                                <i class="fa-solid fa-circle-exclamation text-warning fs-5"></i>
-                            {% else %}
-                                <i class="fa-solid fa-circle-info text-info fs-5"></i>
-                            {% endif %}
-                            <div>{{ message }}</div>
-                        </div>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endfor %}
+            <a href="{{ url_for('dashboard') }}" {% if request.endpoint == 'dashboard' %}class="active"{% endif %}>Dashboard</a>
+            <a href="{{ url_for('history') }}"   {% if request.endpoint == 'history'   %}class="active"{% endif %}>History</a>
+            <a href="{{ url_for('evaluation') }}" {% if request.endpoint == 'evaluation' %}class="active"{% endif %}>ML Metrics</a>
+            {% if is_admin %}
+                <a href="{{ url_for('admin_dashboard') }}" style="color: var(--warning);">Admin</a>
             {% endif %}
-        {% endwith %}
+            <a href="{{ url_for('auth.logout') }}" style="color: var(--danger);">
+                <i class="fa-solid fa-right-from-bracket me-1"></i> Log Out
+            </a>
+        {% else %}
+            <a href="{{ url_for('auth.login') }}">Sign In</a>
+            <a href="{{ url_for('auth.register') }}" class="btn-scan">Get Started</a>
+        {% endif %}
     </div>
+</nav>
 
-    <!-- Main Content Block -->
-    <main class="flex-grow-1 container-fluid px-lg-4 py-3">
-        {% block content %}{% endblock %}
-    </main>
+<!-- FLASH MESSAGES -->
+<div class="flash-wrap">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash-msg flash-{{ category }}">
+                    <i class="fa-solid {% if category == 'success' %}fa-circle-check{% elif category == 'danger' %}fa-triangle-exclamation{% elif category == 'warning' %}fa-circle-exclamation{% else %}fa-circle-info{% endif %} me-2"></i>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+</div>
 
-    <!-- Footer -->
-    <footer>
-        <div class="container-fluid px-lg-4 d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
-            <div>
-                <span class="text-light fw-bold">MailShield</span> &bull; Final-Year Academic Cyber Threat Detection Project
-            </div>
-            <div class="small">
-                <span>Multi-Vector NLP &bull; Lexical URL Heuristics &bull; Hybrid Risk Synthesis</span>
-            </div>
-        </div>
-    </footer>
+<!-- CONTENT -->
+<main>
+    {% block content %}{% endblock %}
+</main>
 
-    <!-- Bootstrap 5 Bundle JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Custom Application JS -->
-    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+<!-- FOOTER -->
+<footer>
+    MailShield &bull; Final-Year Academic Project &bull; Email Spam & Phishing Detection System
+</footer>
 
-    {% block extra_scripts %}{% endblock %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+{% block extra_scripts %}{% endblock %}
 </body>
 </html>

@@ -1,57 +1,62 @@
 {% extends "base.html" %}
-
-{% block title %}Sign In – MailShield Security Portal{% endblock %}
+{% block title %}Sign In – MailShield{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-5 col-lg-4">
-            <div class="ms-card p-4">
-                <div class="text-center mb-4">
-                    <div class="brand-badge d-inline-block mb-2"><i class="fa-solid fa-shield-halved"></i> MAILSHIELD</div>
-                    <h4 class="text-white fw-bold">Sign In</h4>
-                    <p class="text-secondary small">Access the Threat Detection & Analysis Dashboard</p>
+<div style="min-height:70vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem;">
+    <div style="width:100%; max-width:400px;">
+
+        <!-- Logo -->
+        <div style="text-align:center; margin-bottom:2rem;">
+            <div style="font-size:2.5rem; margin-bottom:0.5rem;">🛡️</div>
+            <h1 style="font-size:1.5rem; font-weight:800; color:#f1f5f9; margin-bottom:0.25rem;">Welcome back</h1>
+            <p style="color:#64748b; font-size:0.9rem; margin:0;">Sign in to your MailShield account</p>
+        </div>
+
+        <!-- Form -->
+        <div class="card-box" style="padding:2rem;">
+            <form method="POST" action="{{ url_for('auth.login', next=request.args.get('next')) }}">
+
+                <div style="margin-bottom:1.25rem;">
+                    <label for="identifier" style="display:block; font-size:0.875rem; font-weight:600; color:#64748b; margin-bottom:0.4rem;">
+                        Username or Email
+                    </label>
+                    <input type="text" id="identifier" name="identifier"
+                           value="{{ identifier or '' }}"
+                           class="form-control"
+                           placeholder="Enter your username"
+                           autofocus required
+                           style="font-size:0.95rem; padding:0.75rem 1rem;">
                 </div>
 
-                <form method="POST" action="{{ url_for('auth.login', next=request.args.get('next')) }}">
-                    <div class="mb-3">
-                        <label for="identifier" class="form-label small text-secondary fw-semibold">Username or Email</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-black border-secondary text-secondary"><i class="fa-solid fa-user"></i></span>
-                            <input type="text" class="form-control" id="identifier" name="identifier" value="{{ identifier or '' }}" required placeholder="Enter username or email" autofocus>
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="password" class="form-label small text-secondary fw-semibold">Password</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-black border-secondary text-secondary"><i class="fa-solid fa-lock"></i></span>
-                            <input type="password" class="form-control" id="password" name="password" required placeholder="Enter password">
-                        </div>
-                    </div>
-
-                    <div class="mb-4 form-check">
-                        <input type="checkbox" class="form-check-input" id="remember" name="remember">
-                        <label class="form-check-label small text-secondary" for="remember">Remember this session</label>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary w-100 py-2">
-                        <i class="fa-solid fa-arrow-right-to-bracket me-2"></i> Authenticate & Enter
-                    </button>
-                </form>
-
-                <div class="mt-4 pt-3 border-top border-secondary text-center small text-secondary">
-                    Don't have an account? <a href="{{ url_for('auth.register') }}" class="text-primary text-decoration-none fw-semibold">Register here</a>
+                <div style="margin-bottom:1.75rem;">
+                    <label for="password" style="display:block; font-size:0.875rem; font-weight:600; color:#64748b; margin-bottom:0.4rem;">
+                        Password
+                    </label>
+                    <input type="password" id="password" name="password"
+                           class="form-control"
+                           placeholder="Enter your password"
+                           required
+                           style="font-size:0.95rem; padding:0.75rem 1rem;">
                 </div>
 
-                <!-- Academic Evaluation / Demo Credentials Tip Box -->
-                <div class="mt-3 p-2 rounded bg-primary bg-opacity-10 border border-primary small text-light">
-                    <div class="fw-bold text-primary mb-1"><i class="fa-solid fa-key me-1"></i> Academic Demo Credentials:</div>
-                    <div>Default Admin: <code>admin</code> / <code>Admin@12345</code></div>
-                    <div class="text-secondary mt-1">Or register any new account instantly.</div>
-                </div>
+                <button type="submit"
+                        style="width:100%; background:#3b82f6; color:#fff; border:none; border-radius:12px; padding:0.9rem; font-size:1rem; font-weight:700; cursor:pointer; transition:background 0.15s;">
+                    Sign In →
+                </button>
+            </form>
+
+            <div style="text-align:center; margin-top:1.5rem; padding-top:1.25rem; border-top:1px solid #1e2330;">
+                <span style="font-size:0.875rem; color:#64748b;">Don't have an account? </span>
+                <a href="{{ url_for('auth.register') }}" style="color:#3b82f6; font-weight:600; text-decoration:none; font-size:0.875rem;">Register here</a>
             </div>
         </div>
+
+        <!-- Demo credentials hint -->
+        <div style="margin-top:1rem; background:#1e3a5f33; border:1px solid #3b82f655; border-radius:10px; padding:0.85rem 1rem; font-size:0.82rem; color:#93c5fd; text-align:center;">
+            <i class="fa-solid fa-key me-1"></i>
+            Demo login: <code style="background:#1e2330;">admin</code> / <code style="background:#1e2330;">Admin@12345</code>
+        </div>
+
     </div>
 </div>
 {% endblock %}

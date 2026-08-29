@@ -1,61 +1,71 @@
 {% extends "base.html" %}
-
-{% block title %}Register Account – MailShield Security Portal{% endblock %}
+{% block title %}Create Account – MailShield{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-5">
-            <div class="ms-card p-4">
-                <div class="text-center mb-4">
-                    <div class="brand-badge d-inline-block mb-2"><i class="fa-solid fa-shield-halved"></i> MAILSHIELD</div>
-                    <h4 class="text-white fw-bold">Create Security Account</h4>
-                    <p class="text-secondary small">Set up an authenticated analyst profile</p>
+<div style="min-height:70vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem;">
+    <div style="width:100%; max-width:420px;">
+
+        <!-- Logo -->
+        <div style="text-align:center; margin-bottom:2rem;">
+            <div style="font-size:2.5rem; margin-bottom:0.5rem;">🛡️</div>
+            <h1 style="font-size:1.5rem; font-weight:800; color:#f1f5f9; margin-bottom:0.25rem;">Create your account</h1>
+            <p style="color:#64748b; font-size:0.9rem; margin:0;">Free — takes less than a minute</p>
+        </div>
+
+        <!-- Form -->
+        <div class="card-box" style="padding:2rem;">
+            <form method="POST" action="{{ url_for('auth.register') }}">
+
+                <div style="margin-bottom:1.1rem;">
+                    <label for="username" style="display:block; font-size:0.875rem; font-weight:600; color:#64748b; margin-bottom:0.4rem;">Username</label>
+                    <input type="text" id="username" name="username"
+                           value="{{ username or '' }}"
+                           class="form-control"
+                           placeholder="Choose a username"
+                           autofocus required minlength="3"
+                           style="font-size:0.95rem; padding:0.75rem 1rem;">
                 </div>
 
-                <form method="POST" action="{{ url_for('auth.register') }}">
-                    <div class="mb-3">
-                        <label for="username" class="form-label small text-secondary fw-semibold">Username</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-black border-secondary text-secondary"><i class="fa-solid fa-user"></i></span>
-                            <input type="text" class="form-control" id="username" name="username" value="{{ username or '' }}" required minlength="3" placeholder="Choose a unique username" autofocus>
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="email" class="form-label small text-secondary fw-semibold">Email Address</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-black border-secondary text-secondary"><i class="fa-solid fa-envelope"></i></span>
-                            <input type="email" class="form-control" id="email" name="email" value="{{ email or '' }}" required placeholder="name@organization.com">
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="password" class="form-label small text-secondary fw-semibold">Password</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-black border-secondary text-secondary"><i class="fa-solid fa-lock"></i></span>
-                            <input type="password" class="form-control" id="password" name="password" required minlength="6" placeholder="At least 6 characters">
-                        </div>
-                    </div>
-
-                    <div class="mb-4">
-                        <label for="confirm_password" class="form-label small text-secondary fw-semibold">Confirm Password</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-black border-secondary text-secondary"><i class="fa-solid fa-lock-open"></i></span>
-                            <input type="password" class="form-control" id="confirm_password" name="confirm_password" required minlength="6" placeholder="Re-enter password">
-                        </div>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary w-100 py-2">
-                        <i class="fa-solid fa-user-check me-2"></i> Complete Registration
-                    </button>
-                </form>
-
-                <div class="mt-4 pt-3 border-top border-secondary text-center small text-secondary">
-                    Already registered? <a href="{{ url_for('auth.login') }}" class="text-primary text-decoration-none fw-semibold">Sign in here</a>
+                <div style="margin-bottom:1.1rem;">
+                    <label for="email" style="display:block; font-size:0.875rem; font-weight:600; color:#64748b; margin-bottom:0.4rem;">Email Address</label>
+                    <input type="email" id="email" name="email"
+                           value="{{ email or '' }}"
+                           class="form-control"
+                           placeholder="you@example.com"
+                           required
+                           style="font-size:0.95rem; padding:0.75rem 1rem;">
                 </div>
+
+                <div style="margin-bottom:1.1rem;">
+                    <label for="password" style="display:block; font-size:0.875rem; font-weight:600; color:#64748b; margin-bottom:0.4rem;">Password</label>
+                    <input type="password" id="password" name="password"
+                           class="form-control"
+                           placeholder="At least 6 characters"
+                           required minlength="6"
+                           style="font-size:0.95rem; padding:0.75rem 1rem;">
+                </div>
+
+                <div style="margin-bottom:1.75rem;">
+                    <label for="confirm_password" style="display:block; font-size:0.875rem; font-weight:600; color:#64748b; margin-bottom:0.4rem;">Confirm Password</label>
+                    <input type="password" id="confirm_password" name="confirm_password"
+                           class="form-control"
+                           placeholder="Re-enter password"
+                           required minlength="6"
+                           style="font-size:0.95rem; padding:0.75rem 1rem;">
+                </div>
+
+                <button type="submit"
+                        style="width:100%; background:#3b82f6; color:#fff; border:none; border-radius:12px; padding:0.9rem; font-size:1rem; font-weight:700; cursor:pointer; transition:background 0.15s;">
+                    Create Account →
+                </button>
+            </form>
+
+            <div style="text-align:center; margin-top:1.5rem; padding-top:1.25rem; border-top:1px solid #1e2330;">
+                <span style="font-size:0.875rem; color:#64748b;">Already have an account? </span>
+                <a href="{{ url_for('auth.login') }}" style="color:#3b82f6; font-weight:600; text-decoration:none; font-size:0.875rem;">Sign in</a>
             </div>
         </div>
+
     </div>
 </div>
 {% endblock %}
