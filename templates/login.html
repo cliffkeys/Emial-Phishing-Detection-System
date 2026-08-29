@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Sign In – MailShield Security Portal{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5 col-lg-4">
+            <div class="ms-card p-4">
+                <div class="text-center mb-4">
+                    <div class="brand-badge d-inline-block mb-2"><i class="fa-solid fa-shield-halved"></i> MAILSHIELD</div>
+                    <h4 class="text-white fw-bold">Sign In</h4>
+                    <p class="text-secondary small">Access the Threat Detection & Analysis Dashboard</p>
+                </div>
+
+                <form method="POST" action="{{ url_for('auth.login', next=request.args.get('next')) }}">
+                    <div class="mb-3">
+                        <label for="identifier" class="form-label small text-secondary fw-semibold">Username or Email</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-black border-secondary text-secondary"><i class="fa-solid fa-user"></i></span>
+                            <input type="text" class="form-control" id="identifier" name="identifier" value="{{ identifier or '' }}" required placeholder="Enter username or email" autofocus>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label small text-secondary fw-semibold">Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-black border-secondary text-secondary"><i class="fa-solid fa-lock"></i></span>
+                            <input type="password" class="form-control" id="password" name="password" required placeholder="Enter password">
+                        </div>
+                    </div>
+
+                    <div class="mb-4 form-check">
+                        <input type="checkbox" class="form-check-input" id="remember" name="remember">
+                        <label class="form-check-label small text-secondary" for="remember">Remember this session</label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-2">
+                        <i class="fa-solid fa-arrow-right-to-bracket me-2"></i> Authenticate & Enter
+                    </button>
+                </form>
+
+                <div class="mt-4 pt-3 border-top border-secondary text-center small text-secondary">
+                    Don't have an account? <a href="{{ url_for('auth.register') }}" class="text-primary text-decoration-none fw-semibold">Register here</a>
+                </div>
+
+                <!-- Academic Evaluation / Demo Credentials Tip Box -->
+                <div class="mt-3 p-2 rounded bg-primary bg-opacity-10 border border-primary small text-light">
+                    <div class="fw-bold text-primary mb-1"><i class="fa-solid fa-key me-1"></i> Academic Demo Credentials:</div>
+                    <div>Default Admin: <code>admin</code> / <code>Admin@12345</code></div>
+                    <div class="text-secondary mt-1">Or register any new account instantly.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

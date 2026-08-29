@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Register Account – MailShield Security Portal{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="ms-card p-4">
+                <div class="text-center mb-4">
+                    <div class="brand-badge d-inline-block mb-2"><i class="fa-solid fa-shield-halved"></i> MAILSHIELD</div>
+                    <h4 class="text-white fw-bold">Create Security Account</h4>
+                    <p class="text-secondary small">Set up an authenticated analyst profile</p>
+                </div>
+
+                <form method="POST" action="{{ url_for('auth.register') }}">
+                    <div class="mb-3">
+                        <label for="username" class="form-label small text-secondary fw-semibold">Username</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-black border-secondary text-secondary"><i class="fa-solid fa-user"></i></span>
+                            <input type="text" class="form-control" id="username" name="username" value="{{ username or '' }}" required minlength="3" placeholder="Choose a unique username" autofocus>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label small text-secondary fw-semibold">Email Address</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-black border-secondary text-secondary"><i class="fa-solid fa-envelope"></i></span>
+                            <input type="email" class="form-control" id="email" name="email" value="{{ email or '' }}" required placeholder="name@organization.com">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label small text-secondary fw-semibold">Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-black border-secondary text-secondary"><i class="fa-solid fa-lock"></i></span>
+                            <input type="password" class="form-control" id="password" name="password" required minlength="6" placeholder="At least 6 characters">
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="confirm_password" class="form-label small text-secondary fw-semibold">Confirm Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-black border-secondary text-secondary"><i class="fa-solid fa-lock-open"></i></span>
+                            <input type="password" class="form-control" id="confirm_password" name="confirm_password" required minlength="6" placeholder="Re-enter password">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-2">
+                        <i class="fa-solid fa-user-check me-2"></i> Complete Registration
+                    </button>
+                </form>
+
+                <div class="mt-4 pt-3 border-top border-secondary text-center small text-secondary">
+                    Already registered? <a href="{{ url_for('auth.login') }}" class="text-primary text-decoration-none fw-semibold">Sign in here</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

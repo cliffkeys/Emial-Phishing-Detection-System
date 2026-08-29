@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block title %}Analyze Email – MailShield Threat Detector{% endblock %}
+
+{% block content %}
+<div class="container py-2">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <h3 class="text-white fw-bold mb-1">
+                <i class="fa-solid fa-envelope-open-text text-info me-2"></i> Submit Email for Threat Inspection
+            </h3>
+            <p class="text-secondary small mb-0">
+                Multi-vector analysis including Machine Learning, Phishing NLP, Lexical URLs, Sender Verification, and Header Auth
+            </p>
+        </div>
+    </div>
+
+    <!-- Quick Demo Presets for Academic Defense -->
+    <div class="ms-card p-3 mb-4 border-info">
+        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-2 mb-2">
+            <div class="small fw-bold text-info">
+                <i class="fa-solid fa-flask-vial me-1"></i> Academic Project Defense Demo Presets:
+            </div>
+            <span class="small text-secondary">Click any preset to pre-fill test scenarios</span>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <button type="button" class="btn btn-sm btn-outline-success" data-demo-sample="legit_meeting">
+                <i class="fa-solid fa-shield-check me-1"></i> 1. Legitimate Meeting (Safe)
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-warning" data-demo-sample="promo_spam">
+                <i class="fa-solid fa-bullhorn me-1"></i> 2. Lottery Sweepstakes (Spam)
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-danger" data-demo-sample="ms_phishing">
+                <i class="fa-solid fa-key me-1"></i> 3. Microsoft Office 365 (Phishing)
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-danger" data-demo-sample="paypal_spoof">
+                <i class="fa-solid fa-triangle-exclamation me-1"></i> 4. PayPal Account Alert (Phishing)
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-danger" data-demo-sample="malware_invoice">
+                <i class="fa-solid fa-file-code me-1"></i> 5. Weaponized Attachment (Malicious)
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-primary" data-demo-sample="raw_rfc">
+                <i class="fa-solid fa-code me-1"></i> 6. Raw RFC 822 Email (MIME)
+            </button>
+        </div>
+    </div>
+
+    <!-- Submission Form -->
+    <div class="ms-card p-4">
+        <!-- Input Mode Tabs -->
+        <ul class="nav nav-pills mb-4 border-bottom border-secondary pb-3" id="analysisTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="form-tab" data-bs-toggle="pill" data-bs-target="#form-pane" type="button" role="tab" aria-selected="true">
+                    <i class="fa-solid fa-table-cells me-2"></i> Structured Email Form
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="raw-tab" data-bs-toggle="pill" data-bs-target="#raw-pane" type="button" role="tab" aria-selected="false">
+                    <i class="fa-solid fa-file-lines me-2"></i> Raw RFC 822 / MIME Email
+                </button>
+            </li>
+        </ul>
+
+        <form method="POST" action="{{ url_for('analyze') }}" id="emailAnalysisForm">
+            <input type="hidden" name="input_mode" id="input_mode" value="form">
+
+            <div class="tab-content" id="analysisTabContent">
+                <!-- Tab 1: Form Fields -->
+                <div class="tab-pane fade show active" id="form-pane" role="tabpanel" aria-labelledby="form-tab">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="sender" class="form-label small text-secondary fw-semibold">
+                                From (Sender Email / Display Name) <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="sender" name="sender" placeholder="e.g. IT Support &lt;support@company.com&gt;">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="recipient" class="form-label small text-secondary fw-semibold">
+                                To (Recipient Email) <span class="text-secondary">(optional)</span>
+                            </label>
+                            <input type="text" class="form-control" id="recipient" name="recipient" placeholder="e.g. user@organization.com">
+                        </div>
+
+                        <div class="col-12">
+                            <label for="subject" class="form-label small text-secondary fw-semibold">
+                                Email Subject Line <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="subject" name="subject" placeholder="e.g. URGENT: Verify your account password immediately">
+                        </div>
+
+                        <div class="col-12">
+                            <label for="body" class="form-label small text-secondary fw-semibold">
+                                Email Body Content (Plain text or HTML) <span class="text-danger">*</span>
+                            </label>
+                            <textarea class="form-control font-monospace" id="body" name="body" rows="9" placeholder="Paste the full email text or HTML content here..."></textarea>
+                        </div>
+
+                        <div class="col-12">
+                            <label for="attachments" class="form-label small text-secondary fw-semibold">
+                                Attachments Metadata <span class="text-secondary">(comma-separated file names)</span>
+                            </label>
+                            <input type="text" class="form-control" id="attachments" name="attachments" placeholder="e.g. invoice.pdf.exe, meeting_notes.docx, archive.zip">
+                            <div class="form-text text-secondary small">
+                                <i class="fa-solid fa-shield me-1"></i> For cybersecurity safety, only file names and extensions are inspected. File payloads are never executed.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 2: Raw RFC 822 Email -->
+                <div class="tab-pane fade" id="raw-pane" role="tabpanel" aria-labelledby="raw-tab">
+                    <div class="mb-3">
+                        <label for="raw_email" class="form-label small text-secondary fw-semibold">
+                            Full Raw RFC 822 Email (Headers, MIME boundaries & Body)
+                        </label>
+                        <textarea class="form-control font-monospace" id="raw_email" name="raw_email" rows="14" placeholder="Paste raw email source here (including From, To, Subject, Authentication-Results, and MIME parts)..."></textarea>
+                        <div class="form-text text-secondary small">
+                            <i class="fa-solid fa-code me-1"></i> MailShield will automatically parse transport headers, SPF/DKIM/DMARC verdicts, multipart payloads, and attachments.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Privacy & Defensive Security Guarantee -->
+            <div class="p-3 rounded bg-dark border border-secondary my-4 d-flex align-items-start gap-3">
+                <i class="fa-solid fa-lock text-success fs-4 mt-1"></i>
+                <div class="small text-secondary">
+                    <b class="text-light">Privacy & Local Processing Guarantee:</b> Submitted email content is parsed and evaluated locally within your secure MailShield instance. URLs are decomposed through lexical and structural heuristics <b>without connecting to malicious remote destinations</b>. No unencrypted content is shared with external third-party services.
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="d-flex justify-content-end gap-2">
+                <button type="reset" class="btn btn-outline-secondary px-4">
+                    <i class="fa-solid fa-rotate-left me-1"></i> Reset Fields
+                </button>
+                <button type="submit" class="btn btn-primary px-5 py-2 fw-bold" id="submitBtn">
+                    <i class="fa-solid fa-magnifying-glass-chart me-2"></i> Run Multi-Vector Analysis
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}Machine Learning Model Evaluation – MailShield{% endblock %}
+
+{% block content %}
+<div class="container py-2">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <h3 class="text-white fw-bold mb-1">
+                <i class="fa-solid fa-brain text-success me-2"></i> Machine Learning Model Performance & Metrics
+            </h3>
+            <p class="text-secondary small mb-0">
+                Evaluation results, classification metrics, confusion matrix, and training dataset provenance
+            </p>
+        </div>
+        <div>
+            <a href="{{ url_for('analyze') }}" class="btn btn-primary">
+                <i class="fa-solid fa-envelope-open-text me-1"></i> Test Model in Live Analysis
+            </a>
+        </div>
+    </div>
+
+    <!-- Performance Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="ms-card p-3 text-center">
+                <div class="small text-secondary mb-1">Test Accuracy</div>
+                <div class="fs-2 fw-bold text-success">
+                    {{ (metrics.accuracy * 100)|round(2) }}%
+                </div>
+                <div class="small text-secondary">Overall Correctness</div>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-3">
+            <div class="ms-card p-3 text-center">
+                <div class="small text-secondary mb-1">Precision</div>
+                <div class="fs-2 fw-bold text-info">
+                    {{ (metrics.precision * 100)|round(2) }}%
+                </div>
+                <div class="small text-secondary">Low False Positives</div>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-3">
+            <div class="ms-card p-3 text-center">
+                <div class="small text-secondary mb-1">Recall (Sensitivity)</div>
+                <div class="fs-2 fw-bold text-warning">
+                    {{ (metrics.recall * 100)|round(2) }}%
+                </div>
+                <div class="small text-secondary">Threat Detection Rate</div>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-3">
+            <div class="ms-card p-3 text-center">
+                <div class="small text-secondary mb-1">F1-Score</div>
+                <div class="fs-2 fw-bold text-primary">
+                    {{ (metrics.f1_score * 100)|round(2) }}%
+                </div>
+                <div class="small text-secondary">Harmonic Mean</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Model Details & Confusion Matrix -->
+    <div class="row g-3 mb-4">
+        <div class="col-lg-6">
+            <div class="ms-card h-100 p-4">
+                <h5 class="text-white mb-3"><i class="fa-solid fa-gear me-2 text-primary"></i> Pipeline Architecture</h5>
+                <table class="table ms-table table-sm">
+                    <tr>
+                        <th style="width: 180px;">Classifier Algorithm</th>
+                        <td><span class="badge bg-primary">{{ metrics.model_type or 'Multinomial Naive Bayes (α=0.1)' }}</span></td>
+                    </tr>
+                    <tr>
+                        <th>Feature Extraction</th>
+                        <td>TF-IDF Vectorization (Unigram + Bigram, Sublinear TF)</td>
+                    </tr>
+                    <tr>
+                        <th>Vocabulary Size</th>
+                        <td>{{ metrics.vocabulary_size or '2,500' }} extracted n-gram tokens</td>
+                    </tr>
+                    <tr>
+                        <th>Training / Test Split</th>
+                        <td>80% Training ({{ metrics.train_samples or 'N/A' }} samples) / 20% Stratified Test ({{ metrics.test_samples or 'N/A' }} samples)</td>
+                    </tr>
+                    <tr>
+                        <th>Classes</th>
+                        <td>Binary Classification: <b>Legitimate (Ham)</b> vs <b>Spam / Malicious</b></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="ms-card h-100 p-4">
+                <h5 class="text-white mb-3"><i class="fa-solid fa-table-cells-large me-2 text-info"></i> Confusion Matrix (Test Split)</h5>
+                {% if metrics.confusion_matrix %}
+                    <div class="row g-2 text-center my-2">
+                        <div class="col-6">
+                            <div class="p-3 rounded bg-success bg-opacity-10 border border-success">
+                                <div class="text-success fw-bold fs-4">{{ metrics.confusion_matrix[0][0] }}</div>
+                                <div class="small text-secondary">True Negatives (Legitimate Correct)</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 rounded bg-danger bg-opacity-10 border border-danger">
+                                <div class="text-danger fw-bold fs-4">{{ metrics.confusion_matrix[0][1] }}</div>
+                                <div class="small text-secondary">False Positives (Type I Error)</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 rounded bg-warning bg-opacity-10 border border-warning">
+                                <div class="text-warning fw-bold fs-4">{{ metrics.confusion_matrix[1][0] }}</div>
+                                <div class="small text-secondary">False Negatives (Type II Error)</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 rounded bg-success bg-opacity-10 border border-success">
+                                <div class="text-success fw-bold fs-4">{{ metrics.confusion_matrix[1][1] }}</div>
+                                <div class="small text-secondary">True Positives (Threats Correct)</div>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <p class="text-secondary small">Confusion matrix data is available once model training script is executed.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Academic Disclaimer & Justification for Hybrid Model -->
+    <div class="ms-card p-4 border-warning">
+        <h5 class="text-white mb-2"><i class="fa-solid fa-scale-balanced me-2 text-warning"></i> Academic Project Defense Context: Why Hybrid AI?</h5>
+        <p class="text-secondary small mb-2">
+            In academic machine learning research, standalone text classifiers often achieve high benchmark scores on static test datasets. However, in real-world cybersecurity, attackers continuously evolve novel evasion tactics (such as image-only emails, homoglyph domain deception, zero-font text, and weaponized macros) that bypass pure NLP vectorizers.
+        </p>
+        <p class="text-secondary small mb-0">
+            For this reason, <b>MailShield does not rely exclusively on machine learning</b>. Instead, it deploys a <b>Hybrid Decision Engine</b> that fuses ML text probabilities with deterministic lexical URL heuristics, sender identity validation, RFC header verification, and attachment metadata analysis.
+        </p>
+    </div>
+</div>
+{% endblock %}

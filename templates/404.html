@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Error {{ error_code or 404 }} – MailShield{% endblock %}
+
+{% block content %}
+<div class="container py-5 text-center">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="ms-card p-5">
+                <div class="stat-icon-box bg-danger bg-opacity-10 text-danger mx-auto mb-3" style="width: 70px; height: 70px; font-size: 2rem;">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+                <h1 class="display-4 fw-bold text-white mb-2">{{ error_code or 404 }}</h1>
+                <h5 class="text-light mb-3">Security Alert: Action Interrupted</h5>
+                <p class="text-secondary mb-4">
+                    {{ error_message or 'The requested resource, endpoint, or analysis report could not be found or access is restricted.' }}
+                </p>
+                <div class="d-flex justify-content-center gap-2">
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-primary">
+                        <i class="fa-solid fa-gauge-high me-1"></i> Return to Dashboard
+                    </a>
+                    <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+                        <i class="fa-solid fa-house me-1"></i> Home Page
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

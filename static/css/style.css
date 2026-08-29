@@ -1,0 +1,248 @@
+:root {
+  --ms-bg-main: #0b0f19;
+  --ms-bg-card: #111827;
+  --ms-bg-card-hover: #1f2937;
+  --ms-border: #1e293b;
+  --ms-text-main: #f8fafc;
+  --ms-text-muted: #94a3b8;
+  --ms-primary: #3b82f6;
+  --ms-primary-hover: #2563eb;
+  --ms-safe: #10b981;
+  --ms-spam: #f59e0b;
+  --ms-phishing: #ef4444;
+  --ms-suspicious: #f97316;
+  --ms-critical: #b91c1c;
+  --ms-accent: #06b6d4;
+}
+
+body {
+  background-color: var(--ms-bg-main);
+  color: var(--ms-text-main);
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Navbar */
+.navbar-mailshield {
+  background-color: rgba(17, 24, 39, 0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--ms-border);
+}
+
+.brand-badge {
+  background: linear-gradient(135deg, #2563eb, #06b6d4);
+  color: #fff;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+}
+
+/* Cards */
+.ms-card {
+  background-color: var(--ms-bg-card);
+  border: 1px solid var(--ms-border);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.ms-card:hover {
+  border-color: #334155;
+}
+
+.ms-card-header {
+  background-color: rgba(30, 41, 59, 0.4);
+  border-bottom: 1px solid var(--ms-border);
+  padding: 1rem 1.25rem;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  font-weight: 600;
+}
+
+/* Badges & Pills */
+.badge-safe {
+  background-color: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.badge-spam {
+  background-color: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.badge-phishing {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.badge-suspicious {
+  background-color: rgba(249, 115, 22, 0.15);
+  color: #fb923c;
+  border: 1px solid rgba(249, 115, 22, 0.3);
+}
+
+.badge-critical {
+  background-color: rgba(185, 28, 28, 0.2);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+/* Stat Cards */
+.stat-card {
+  padding: 1.25rem;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.stat-icon-box {
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+.stat-val {
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: var(--ms-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Form Controls */
+.form-control, .form-select {
+  background-color: #0b0f19;
+  border: 1px solid #334155;
+  color: #f8fafc;
+  border-radius: 8px;
+}
+
+.form-control:focus, .form-select:focus {
+  background-color: #0b0f19;
+  border-color: var(--ms-primary);
+  color: #fff;
+  box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.25);
+}
+
+.form-control::placeholder {
+  color: #64748b;
+}
+
+/* Buttons */
+.btn-primary {
+  background-color: var(--ms-primary);
+  border-color: var(--ms-primary);
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 0.5rem 1.25rem;
+}
+
+.btn-primary:hover {
+  background-color: var(--ms-primary-hover);
+  border-color: var(--ms-primary-hover);
+}
+
+/* Tables */
+.ms-table {
+  color: #cbd5e1;
+  vertical-align: middle;
+}
+
+.ms-table th {
+  background-color: rgba(30, 41, 59, 0.5);
+  color: #94a3b8;
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--ms-border);
+}
+
+.ms-table td {
+  border-bottom: 1px solid #1e293b;
+  padding: 0.85rem 0.75rem;
+}
+
+.ms-table tr:hover td {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+/* Result Risk Meter */
+.risk-meter-container {
+  background-color: #1e293b;
+  height: 14px;
+  border-radius: 7px;
+  overflow: hidden;
+  position: relative;
+}
+
+.risk-meter-bar {
+  height: 100%;
+  border-radius: 7px;
+  transition: width 0.8s ease;
+}
+
+/* Classification Result Banner */
+.result-banner {
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid transparent;
+}
+
+.result-banner-phishing {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(185, 28, 28, 0.25));
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+.result-banner-spam {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(217, 119, 6, 0.25));
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+.result-banner-suspicious {
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.15), rgba(194, 65, 12, 0.25));
+  border-color: rgba(249, 115, 22, 0.4);
+}
+
+.result-banner-safe {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(5, 150, 105, 0.25));
+  border-color: rgba(16, 185, 129, 0.4);
+}
+
+/* Indicator items */
+.indicator-item {
+  background-color: rgba(15, 23, 42, 0.6);
+  border: 1px solid var(--ms-border);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Footer */
+footer {
+  margin-top: auto;
+  border-top: 1px solid var(--ms-border);
+  background-color: #0b0f19;
+  padding: 1.5rem 0;
+  color: #64748b;
+  font-size: 0.85rem;
+}

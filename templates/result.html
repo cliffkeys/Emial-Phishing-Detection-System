@@ -1,0 +1,356 @@
+{% extends "base.html" %}
+
+{% block title %}Analysis Result #{{ analysis.id }} – MailShield Threat Report{% endblock %}
+
+{% block content %}
+<div class="container py-2">
+    <!-- Top Actions & Navigation -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <a href="{{ url_for('history') }}" class="btn btn-sm btn-outline-secondary">
+                    <i class="fa-solid fa-arrow-left me-1"></i> Back to History
+                </a>
+                <span class="text-secondary small">Analysis ID: <b>MS-ANL-{{ analysis.id }}</b></span>
+                <span class="text-secondary small">&bull; {{ analysis.created_at.strftime('%Y-%m-%d %H:%M:%S UTC') }}</span>
+            </div>
+            <h3 class="text-white fw-bold mb-0">Email Threat Diagnostic Verdict</h3>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('download_report_pdf', analysis_id=analysis.id) }}" class="btn btn-danger">
+                <i class="fa-solid fa-file-pdf me-1"></i> Download PDF Security Report
+            </a>
+            <a href="{{ url_for('view_report_html', analysis_id=analysis.id) }}" target="_blank" class="btn btn-outline-secondary">
+                <i class="fa-solid fa-print me-1"></i> Printable View
+            </a>
+            <a href="{{ url_for('analyze') }}" class="btn btn-primary">
+                <i class="fa-solid fa-plus me-1"></i> Analyze Another
+            </a>
+        </div>
+    </div>
+
+    <!-- 1. Executive Verdict Banner -->
+    <div class="result-banner {% if analysis.classification == 'PHISHING' %}result-banner-phishing{% elif analysis.classification == 'SPAM' %}result-banner-spam{% elif analysis.classification == 'SUSPICIOUS' %}result-banner-suspicious{% else %}result-banner-safe{% endif %} mb-4">
+        <div class="d-flex align-items-center gap-3">
+            <div class="stat-icon-box {% if analysis.classification == 'PHISHING' %}bg-danger text-white{% elif analysis.classification == 'SPAM' %}bg-warning text-dark{% elif analysis.classification == 'SUSPICIOUS' %}bg-warning text-white{% else %}bg-success text-white{% endif %} fs-3" style="width: 64px; height: 64px;">
+                {% if analysis.classification == 'PHISHING' %}
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                {% elif analysis.classification == 'SPAM' %}
+                    <i class="fa-solid fa-ban"></i>
+                {% elif analysis.classification == 'SUSPICIOUS' %}
+                    <i class="fa-solid fa-circle-question"></i>
+                {% else %}
+                    <i class="fa-solid fa-shield-check"></i>
+                {% endif %}
+            </div>
+            <div>
+                <div class="text-uppercase small fw-bold tracking-wider text-secondary">Final System Verdict</div>
+                <h2 class="text-white fw-bold mb-0">{{ analysis.classification }}</h2>
+                <div class="small mt-1 text-light">
+                    Risk Assessment: <b>{{ analysis.risk_level }}</b> &bull; Cumulative Risk Score: <b>{{ analysis.overall_risk_score|round(1) }} / 100</b>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-md-end mt-3 mt-md-0">
+            <div class="small text-secondary mb-1">Confidence Metrics</div>
+            <div class="d-flex align-items-center gap-3">
+                <div class="text-center p-2 rounded bg-black bg-opacity-40 border border-secondary" style="min-width: 110px;">
+                    <div class="small text-secondary">ML Model</div>
+                    <div class="fs-5 fw-bold text-info">{{ analysis.ml_confidence|round(1) }}%</div>
+                </div>
+                <div class="text-center p-2 rounded bg-black bg-opacity-40 border border-secondary" style="min-width: 110px;">
+                    <div class="small text-secondary">Risk Engine</div>
+                    <div class="fs-5 fw-bold text-warning">{{ analysis.risk_confidence|round(1) }}%</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Email Metadata Summary Card -->
+    <div class="ms-card p-3 mb-4">
+        <div class="row g-2 small">
+            <div class="col-md-6">
+                <span class="text-secondary fw-semibold">From (Sender):</span>
+                <span class="text-light ms-1 font-monospace">{{ analysis.sender }}</span>
+            </div>
+            <div class="col-md-6">
+                <span class="text-secondary fw-semibold">To (Recipient):</span>
+                <span class="text-light ms-1 font-monospace">{{ analysis.recipient or 'N/A' }}</span>
+            </div>
+            <div class="col-12 mt-2">
+                <span class="text-secondary fw-semibold">Subject Line:</span>
+                <span class="text-white ms-1 fw-bold">{{ analysis.subject }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Multi-Vector Sub-Scores Breakdown Grid -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="ms-card p-3 text-center h-100">
+                <div class="small text-secondary mb-1">ML Spam Prob.</div>
+                <div class="fs-4 fw-bold {% if analysis.spam_score >= 50 %}text-warning{% else %}text-success{% endif %}">
+                    {{ analysis.spam_score|round(1) }}%
+                </div>
+                <div class="progress mt-2" style="height: 4px;">
+                    <div class="progress-bar bg-warning" style="width: {{ analysis.spam_score }}%;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="ms-card p-3 text-center h-100">
+                <div class="small text-secondary mb-1">Phishing Text</div>
+                <div class="fs-4 fw-bold {% if analysis.phishing_score >= 50 %}text-danger{% elif analysis.phishing_score >= 20 %}text-warning{% else %}text-success{% endif %}">
+                    {{ analysis.phishing_score|round(1) }}
+                </div>
+                <div class="progress mt-2" style="height: 4px;">
+                    <div class="progress-bar bg-danger" style="width: {{ analysis.phishing_score }}%;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="ms-card p-3 text-center h-100">
+                <div class="small text-secondary mb-1">URL Risk</div>
+                <div class="fs-4 fw-bold {% if analysis.url_risk_score >= 50 %}text-danger{% elif analysis.url_risk_score >= 20 %}text-warning{% else %}text-success{% endif %}">
+                    {{ analysis.url_risk_score|round(1) }}
+                </div>
+                <div class="progress mt-2" style="height: 4px;">
+                    <div class="progress-bar bg-danger" style="width: {{ analysis.url_risk_score }}%;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="ms-card p-3 text-center h-100">
+                <div class="small text-secondary mb-1">Sender Risk</div>
+                <div class="fs-4 fw-bold {% if analysis.sender_risk_score >= 50 %}text-danger{% elif analysis.sender_risk_score >= 20 %}text-warning{% else %}text-success{% endif %}">
+                    {{ analysis.sender_risk_score|round(1) }}
+                </div>
+                <div class="progress mt-2" style="height: 4px;">
+                    <div class="progress-bar bg-danger" style="width: {{ analysis.sender_risk_score }}%;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="ms-card p-3 text-center h-100">
+                <div class="small text-secondary mb-1">Attachments</div>
+                <div class="fs-4 fw-bold {% if analysis.attachment_risk_score >= 50 %}text-danger{% elif analysis.attachment_risk_score >= 20 %}text-warning{% else %}text-success{% endif %}">
+                    {{ analysis.attachment_risk_score|round(1) }}
+                </div>
+                <div class="progress mt-2" style="height: 4px;">
+                    <div class="progress-bar bg-danger" style="width: {{ analysis.attachment_risk_score }}%;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="ms-card p-3 text-center h-100">
+                <div class="small text-secondary mb-1">Header Auth</div>
+                <div class="fs-4 fw-bold {% if analysis.header_risk_score >= 30 %}text-danger{% else %}text-success{% endif %}">
+                    {{ analysis.header_risk_score|round(1) }}
+                </div>
+                <div class="progress mt-2" style="height: 4px;">
+                    <div class="progress-bar bg-info" style="width: {{ analysis.header_risk_score }}%;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. Explainability: "Why Did this Email Receive this Classification?" -->
+    <div class="ms-card mb-4">
+        <div class="ms-card-header d-flex justify-content-between align-items-center">
+            <span>
+                <i class="fa-solid fa-list-check me-2 text-primary"></i> 
+                Explainable AI & Threat Breakdown (Why this classification?)
+            </span>
+            <span class="badge bg-secondary">{{ analysis.indicators|length }} Flagged Indicators</span>
+        </div>
+        <div class="p-4">
+            {% if analysis.indicators %}
+                <div class="row g-2 mb-3">
+                    {% for ind in analysis.indicators %}
+                        <div class="col-md-6">
+                            <div class="indicator-item d-flex align-items-start gap-2 h-100">
+                                {% if ind.severity == 'CRITICAL' %}
+                                    <span class="badge badge-critical mt-1"><i class="fa-solid fa-circle-radiation"></i> CRITICAL</span>
+                                {% elif ind.severity == 'HIGH' %}
+                                    <span class="badge badge-phishing mt-1"><i class="fa-solid fa-triangle-exclamation"></i> HIGH</span>
+                                {% elif ind.severity == 'MEDIUM' %}
+                                    <span class="badge badge-suspicious mt-1"><i class="fa-solid fa-circle-exclamation"></i> MEDIUM</span>
+                                {% else %}
+                                    <span class="badge badge-safe mt-1"><i class="fa-solid fa-info"></i> LOW</span>
+                                {% endif %}
+                                <div class="flex-grow-1">
+                                    <div class="fw-bold text-white small">{{ ind.indicator_name }}</div>
+                                    <div class="small text-secondary">{{ ind.description }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="p-3 rounded bg-success bg-opacity-10 border border-success mb-3">
+                    <div class="text-success fw-bold mb-1"><i class="fa-solid fa-circle-check me-1"></i> Clean Security Assessment</div>
+                    <div class="text-light small">No coercive linguistic patterns, malicious URLs, sender impersonation, or dangerous attachments were triggered.</div>
+                </div>
+            {% endif %}
+
+            <!-- Dynamic Positive Indicators if present -->
+            {% if analysis.summary_data.safe_indicators %}
+                <div class="mt-3 pt-3 border-top border-secondary">
+                    <div class="small fw-bold text-success mb-2"><i class="fa-solid fa-shield-check me-1"></i> Benign Attributes Observed:</div>
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for safe_item in analysis.summary_data.safe_indicators %}
+                            <span class="badge bg-dark border border-success text-success p-2 small">
+                                <i class="fa-solid fa-check me-1"></i> {{ safe_item }}
+                            </span>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- 5. URL Analysis Details Table (if any URLs detected) -->
+    {% if analysis.url_analyses %}
+        <div class="ms-card mb-4">
+            <div class="ms-card-header d-flex justify-content-between align-items-center">
+                <span><i class="fa-solid fa-link me-2 text-info"></i> Extracted URLs Analysis ({{ analysis.url_analyses|length }})</span>
+                <span class="small text-secondary">Defensive Lexical Inspection</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table ms-table mb-0">
+                    <thead>
+                        <tr>
+                            <th>URL & Target Domain</th>
+                            <th>HTTPS</th>
+                            <th>IP Host</th>
+                            <th>Shortener</th>
+                            <th>Suspicious TLD</th>
+                            <th>URL Risk</th>
+                            <th>Diagnostic Reasons</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for u in analysis.url_analyses %}
+                            <tr>
+                                <td>
+                                    <div class="font-monospace text-light text-truncate" style="max-width: 280px;" title="{{ u.url }}">
+                                        {{ u.url }}
+                                    </div>
+                                    <div class="small text-secondary">Domain: <code>{{ u.domain }}</code></div>
+                                </td>
+                                <td>
+                                    {% if u.is_https %}
+                                        <span class="badge badge-safe">HTTPS</span>
+                                    {% else %}
+                                        <span class="badge badge-phishing">HTTP</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if u.has_ip %}
+                                        <span class="badge badge-critical">Yes</span>
+                                    {% else %}
+                                        <span class="text-secondary small">No</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if u.is_shortener %}
+                                        <span class="badge badge-warning">Shortener</span>
+                                    {% else %}
+                                        <span class="text-secondary small">Direct</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if u.suspicious_tld %}
+                                        <span class="badge badge-danger">High-Risk TLD</span>
+                                    {% else %}
+                                        <span class="text-secondary small">Standard</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="fw-bold {% if u.risk_score >= 60 %}text-danger{% elif u.risk_score >= 30 %}text-warning{% else %}text-success{% endif %}">
+                                        {{ u.risk_score|round(1) }} / 100
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if u.risk_reasons %}
+                                        <ul class="mb-0 ps-3 small text-secondary">
+                                            {% for r in u.risk_reasons %}
+                                                <li>{{ r }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% else %}
+                                        <span class="text-success small">No structural anomalies</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- 6. Sender Identity & Transport Authentication -->
+    <div class="row g-3 mb-4">
+        <!-- Sender Box -->
+        <div class="col-lg-6">
+            <div class="ms-card h-100 p-4">
+                <h5 class="text-white mb-3"><i class="fa-solid fa-user-shield me-2 text-warning"></i> Sender Identity Evaluation</h5>
+                <div class="p-3 rounded bg-black border border-secondary mb-3 small">
+                    <div class="text-secondary mb-1">Claimed Sender: <span class="text-light font-monospace">{{ analysis.sender }}</span></div>
+                    <div class="text-secondary">Sender Risk Score: <span class="fw-bold {% if analysis.sender_risk_score >= 50 %}text-danger{% elif analysis.sender_risk_score >= 20 %}text-warning{% else %}text-success{% endif %}">{{ analysis.sender_risk_score|round(1) }} / 100</span></div>
+                </div>
+                <div class="small text-secondary">
+                    {% if analysis.sender_risk_score > 0 %}
+                        <div class="text-warning mb-1"><i class="fa-solid fa-circle-exclamation me-1"></i> Sender identity shows anomalies (e.g. display name brand claims or unaligned reply-to).</div>
+                    {% else %}
+                        <div class="text-success"><i class="fa-solid fa-circle-check me-1"></i> Sender syntax and domain format are valid with no display name spoofing triggers.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Header Authentication Box -->
+        <div class="col-lg-6">
+            <div class="ms-card h-100 p-4">
+                <h5 class="text-white mb-3"><i class="fa-solid fa-certificate me-2 text-info"></i> Transport Authentication Verdicts</h5>
+                <div class="p-3 rounded bg-black border border-secondary mb-3 small">
+                    <div class="text-light mb-1">
+                        <b>SPF / DKIM / DMARC:</b> 
+                        <span class="text-info font-monospace ms-1">{{ analysis.raw_headers or 'Not available in submitted sample' }}</span>
+                    </div>
+                </div>
+                <div class="small text-secondary">
+                    <b>Academic Notes:</b>
+                    <ul class="ps-3 mb-0 mt-1">
+                        <li><b>SPF:</b> Verifies mail server IP authorization via DNS.</li>
+                        <li><b>DKIM:</b> Validates cryptographic signature integrity.</li>
+                        <li><b>DMARC:</b> Enforces SPF & DKIM alignment policies.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 7. Actionable Security Recommendations -->
+    <div class="ms-card p-4 border-warning mb-4">
+        <h5 class="text-white mb-3"><i class="fa-solid fa-shield-virus me-2 text-warning"></i> Actionable Security Recommendations</h5>
+        <div class="row g-2">
+            {% for rec in analysis.recommendations %}
+                <div class="col-md-6">
+                    <div class="p-3 rounded bg-dark border border-secondary small text-light d-flex align-items-center gap-2 h-100">
+                        <i class="fa-solid fa-arrow-right text-warning"></i>
+                        <span><b>{{ rec }}</b></span>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

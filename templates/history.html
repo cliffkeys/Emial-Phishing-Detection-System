@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block title %}Analysis History – MailShield Threat Registry{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-2">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <h3 class="text-white fw-bold mb-1">
+                <i class="fa-solid fa-clock-rotate-left text-warning me-2"></i> Threat Analysis History
+            </h3>
+            <p class="text-secondary small mb-0">
+                Filter, search, review, and export past email security assessments
+            </p>
+        </div>
+        <div>
+            <a href="{{ url_for('analyze') }}" class="btn btn-primary">
+                <i class="fa-solid fa-plus me-2"></i> Analyze New Email
+            </a>
+        </div>
+    </div>
+
+    <!-- Filters & Search Toolbar -->
+    <div class="ms-card p-3 mb-4">
+        <form method="GET" action="{{ url_for('history') }}" class="row g-2 align-items-center">
+            <!-- Search Query -->
+            <div class="col-md-4">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-black border-secondary text-secondary"><i class="fa-solid fa-magnifying-glass"></i></span>
+                    <input type="text" class="form-control" name="q" value="{{ q }}" placeholder="Search by sender or subject...">
+                </div>
+            </div>
+
+            <!-- Classification Filter -->
+            <div class="col-md-3">
+                <select class="form-select form-select-sm" name="classification">
+                    <option value="" {% if not classification %}selected{% endif %}>All Classifications</option>
+                    <option value="SAFE" {% if classification == 'SAFE' %}selected{% endif %}>Safe</option>
+                    <option value="SPAM" {% if classification == 'SPAM' %}selected{% endif %}>Spam</option>
+                    <option value="PHISHING" {% if classification == 'PHISHING' %}selected{% endif %}>Phishing</option>
+                    <option value="SUSPICIOUS" {% if classification == 'SUSPICIOUS' %}selected{% endif %}>Suspicious</option>
+                </select>
+            </div>
+
+            <!-- Sort By -->
+            <div class="col-md-3">
+                <select class="form-select form-select-sm" name="sort">
+                    <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Sort: Newest First</option>
+                    <option value="oldest" {% if sort == 'oldest' %}selected{% endif %}>Sort: Oldest First</option>
+                    <option value="highest_risk" {% if sort == 'highest_risk' %}selected{% endif %}>Sort: Highest Risk</option>
+                </select>
+            </div>
+
+            <!-- Submit Buttons -->
+            <div class="col-md-2 d-flex gap-2">
+                <button type="submit" class="btn btn-primary btn-sm flex-grow-1">
+                    <i class="fa-solid fa-filter me-1"></i> Apply
+                </button>
+                <a href="{{ url_for('history') }}" class="btn btn-outline-secondary btn-sm" title="Clear Filters">
+                    <i class="fa-solid fa-rotate-left"></i>
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- History Table -->
+    <div class="ms-card mb-4">
+        <div class="table-responsive">
+            <table class="table ms-table mb-0">
+                <thead>
+                    <tr>
+                        <th>Date & Time</th>
+                        <th>Sender</th>
+                        <th>Subject</th>
+                        <th>Classification</th>
+                        <th>Risk Score</th>
+                        <th>ML Conf.</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if analyses %}
+                        {% for anl in analyses %}
+                            <tr>
+                                <td class="small text-secondary font-monospace">{{ anl.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td>
+                                    <div class="fw-semibold text-light text-truncate" style="max-width: 180px;" title="{{ anl.sender }}">{{ anl.sender }}</div>
+                                </td>
+                                <td>
+                                    <div class="text-light text-truncate" style="max-width: 280px;" title="{{ anl.subject }}">{{ anl.subject }}</div>
+                                </td>
+                                <td>
+                                    {% if anl.classification == 'SAFE' %}
+                                        <span class="badge badge-safe"><i class="fa-solid fa-circle-check me-1"></i> SAFE</span>
+                                    {% elif anl.classification == 'SPAM' %}
+                                        <span class="badge badge-spam"><i class="fa-solid fa-ban me-1"></i> SPAM</span>
+                                    {% elif anl.classification == 'PHISHING' %}
+                                        <span class="badge badge-phishing"><i class="fa-solid fa-triangle-exclamation me-1"></i> PHISHING</span>
+                                    {% else %}
+                                        <span class="badge badge-suspicious"><i class="fa-solid fa-circle-question me-1"></i> SUSPICIOUS</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2" style="min-width: 100px;">
+                                        <div class="risk-meter-container flex-grow-1">
+                                            <div class="risk-meter-bar {% if anl.overall_risk_score >= 80 %}bg-danger{% elif anl.overall_risk_score >= 60 %}bg-danger{% elif anl.overall_risk_score >= 30 %}bg-warning{% else %}bg-success{% endif %}" style="width: {{ anl.overall_risk_score }}%;"></div>
+                                        </div>
+                                        <span class="small fw-bold {% if anl.overall_risk_score >= 60 %}text-danger{% elif anl.overall_risk_score >= 30 %}text-warning{% else %}text-success{% endif %}">{{ anl.overall_risk_score|round(1) }}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="small text-info">{{ anl.ml_confidence|round(1) }}%</span>
+                                </td>
+                                <td class="text-end">
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{{ url_for('result', analysis_id=anl.id) }}" class="btn btn-outline-primary" title="View Full Diagnosis">
+                                            <i class="fa-solid fa-eye me-1"></i> View
+                                        </a>
+                                        <a href="{{ url_for('download_report_pdf', analysis_id=anl.id) }}" class="btn btn-outline-secondary" title="Download PDF Report">
+                                            <i class="fa-solid fa-file-pdf"></i>
+                                        </a>
+                                        <form method="POST" action="{{ url_for('delete_analysis', analysis_id=anl.id) }}" onsubmit="return confirm('Delete this analysis record permanently?');" class="d-inline">
+                                            <button type="submit" class="btn btn-outline-danger" title="Delete Record">
+                                                <i class="fa-solid fa-trash-can"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center py-5 text-secondary">
+                                <i class="fa-solid fa-folder-open fa-3x mb-3 text-secondary opacity-50"></i>
+                                <p class="mb-1">No matching analysis records found.</p>
+                                <a href="{{ url_for('analyze') }}" class="btn btn-sm btn-primary mt-2">Submit an Email for Inspection</a>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if pagination and pagination.pages > 1 %}
+            <div class="p-3 border-top border-secondary d-flex justify-content-between align-items-center">
+                <div class="small text-secondary">
+                    Showing page <b>{{ pagination.page }}</b> of <b>{{ pagination.pages }}</b> ({{ pagination.total }} total records)
+                </div>
+                <ul class="pagination pagination-sm mb-0">
+                    {% if pagination.has_prev %}
+                        <li class="page-item"><a class="page-link bg-dark border-secondary text-light" href="{{ url_for('history', page=pagination.prev_num, q=q, classification=classification, sort=sort) }}">Previous</a></li>
+                    {% endif %}
+                    {% for p in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                        {% if p %}
+                            <li class="page-item {% if p == pagination.page %}active{% endif %}">
+                                <a class="page-link {% if p == pagination.page %}bg-primary border-primary text-white{% else %}bg-dark border-secondary text-light{% endif %}" href="{{ url_for('history', page=p, q=q, classification=classification, sort=sort) }}">{{ p }}</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled"><span class="page-link bg-dark border-secondary text-secondary">&hellip;</span></li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if pagination.has_next %}
+                        <li class="page-item"><a class="page-link bg-dark border-secondary text-light" href="{{ url_for('history', page=pagination.next_num, q=q, classification=classification, sort=sort) }}">Next</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}MailShield – Email Spam & Phishing Detection System{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Hero Section -->
+    <div class="row align-items-center g-5 py-3">
+        <div class="col-lg-7">
+            <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill badge-phishing mb-3">
+                <i class="fa-solid fa-shield-virus"></i>
+                <span class="small fw-bold">Academic Cybersecurity Project Defense</span>
+            </div>
+            <h1 class="display-5 fw-bold text-white mb-3 lh-sm">
+                Advanced Email Threat Detection Powered by <span class="text-primary">Hybrid AI & Heuristics</span>
+            </h1>
+            <p class="lead text-secondary mb-4">
+                MailShield combines Machine Learning, Natural Language Processing, Lexical URL Analysis, 
+                and Multi-Vector Cybersecurity Heuristics to accurately classify emails into <b>Safe</b>, <b>Spam</b>, 
+                <b>Phishing</b>, or <b>Suspicious</b> with explainable reasoning.
+            </p>
+            <div class="d-flex flex-wrap gap-3">
+                <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg px-4">
+                    <i class="fa-solid fa-rocket me-2"></i> Get Started Free
+                </a>
+                <a href="{{ url_for('auth.login') }}" class="btn btn-outline-secondary btn-lg px-4">
+                    <i class="fa-solid fa-arrow-right-to-bracket me-2"></i> Sign In to Demo
+                </a>
+                <a href="{{ url_for('about') }}" class="btn btn-outline-info btn-lg px-3">
+                    <i class="fa-solid fa-diagram-project me-2"></i> System Architecture
+                </a>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="ms-card p-4 border-primary">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <span class="badge badge-phishing px-3 py-2 fs-6"><i class="fa-solid fa-triangle-exclamation me-1"></i> Threat Detected</span>
+                    <span class="text-danger fw-bold">Risk Score: 92/100</span>
+                </div>
+                <h5 class="text-white mb-2">Subject: URGENT: Office 365 Account Suspension</h5>
+                <div class="p-2 rounded bg-black mb-3 small font-monospace text-secondary">
+                    From: Microsoft Security &lt;support@login-auth-verify.xyz&gt;<br>
+                    Target URL: http://login-microsoft-secure-auth.xyz/verify
+                </div>
+                <div class="small text-secondary mb-3">
+                    <div class="text-danger mb-1"><i class="fa-solid fa-circle-xmark me-1"></i> Display name brand impersonation detected</div>
+                    <div class="text-danger mb-1"><i class="fa-solid fa-circle-xmark me-1"></i> Credential harvesting request detected</div>
+                    <div class="text-danger mb-1"><i class="fa-solid fa-circle-xmark me-1"></i> High-risk suspicious TLD (.xyz) in URL</div>
+                    <div class="text-warning"><i class="fa-solid fa-circle-exclamation me-1"></i> Urgent coercive language detected</div>
+                </div>
+                <div class="p-2 rounded bg-danger bg-opacity-10 border border-danger small text-danger">
+                    <b>Recommendation:</b> Do NOT click embedded links or provide credentials.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feature Highlights -->
+    <div class="row g-4 py-5 mt-2">
+        <div class="col-md-4">
+            <div class="ms-card h-100 p-4">
+                <div class="stat-icon-box bg-primary bg-opacity-10 text-primary mb-3">
+                    <i class="fa-solid fa-brain"></i>
+                </div>
+                <h5 class="text-white">NLP & Machine Learning</h5>
+                <p class="text-secondary small">
+                    TF-IDF n-gram vectorization paired with calibrated Naive Bayes probabilistic models trained on authentic ham, promotional spam, and phishing datasets.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="ms-card h-100 p-4">
+                <div class="stat-icon-box bg-info bg-opacity-10 text-info mb-3">
+                    <i class="fa-solid fa-link"></i>
+                </div>
+                <h5 class="text-white">Static URL Decomposition</h5>
+                <p class="text-secondary small">
+                    Deep inspection of IP hosts, suspicious TLDs, URL shorteners, Punycode homographs, deceptive subdomains, and brand spoofing patterns without executing malicious connections.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="ms-card h-100 p-4">
+                <div class="stat-icon-box bg-warning bg-opacity-10 text-warning mb-3">
+                    <i class="fa-solid fa-user-shield"></i>
+                </div>
+                <h5 class="text-white">Sender & Header Analysis</h5>
+                <p class="text-secondary small">
+                    Detects display-name deception, From vs Reply-To mismatches, typosquatted lookalike domains, and extracts RFC standard SPF, DKIM, and DMARC authentication verdicts.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

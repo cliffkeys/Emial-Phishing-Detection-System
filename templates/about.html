@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}About & System Architecture – MailShield{% endblock %}
+
+{% block content %}
+<div class="container py-2">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <h3 class="text-white fw-bold mb-1">
+                <i class="fa-solid fa-circle-info text-info me-2"></i> About Project & System Architecture
+            </h3>
+            <p class="text-secondary small mb-0">
+                Design and Implementation of an Email Spam and Phishing Detection System
+            </p>
+        </div>
+    </div>
+
+    <!-- Project Context & Objectives -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-7">
+            <div class="ms-card h-100 p-4">
+                <h5 class="text-white mb-3"><i class="fa-solid fa-graduation-cap me-2 text-primary"></i> Academic Project Abstract</h5>
+                <p class="text-secondary small">
+                    Email continues to be the primary attack vector for cyber threats including credential harvesting, business email compromise (BEC), ransomware dissemination, and unsolicited promotional spam. Conventional single-point detection mechanisms (such as pure keyword filtering or uncontextualized blacklists) fail against dynamic domain spoofing, URL obfuscation, and linguistic social engineering.
+                </p>
+                <p class="text-secondary small">
+                    This project presents <b>MailShield</b>, a defensive cybersecurity platform that combines <b>Natural Language Processing (NLP)</b>, <b>Machine Learning (TF-IDF + Naive Bayes)</b>, <b>Lexical URL Decomposition</b>, <b>Sender Identity Verification</b>, and <b>Transport Header Analysis (SPF, DKIM, DMARC)</b> into a unified <b>Hybrid Risk Synthesis Engine</b>. The system classifies incoming emails into <i>Safe</i>, <i>Spam</i>, <i>Phishing</i>, or <i>Suspicious</i> while generating explainable indicators and actionable remediation guidance.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="ms-card h-100 p-4">
+                <h5 class="text-white mb-3"><i class="fa-solid fa-bullseye me-2 text-success"></i> Primary Objectives</h5>
+                <ul class="text-secondary small ps-3 mb-0">
+                    <li class="mb-2">Implement a robust RFC 822 & form-based email parser capable of extracting headers, MIME parts, URLs, and attachments.</li>
+                    <li class="mb-2">Train and evaluate a supervised Machine Learning spam classification pipeline with TF-IDF n-grams.</li>
+                    <li class="mb-2">Build a static URL decomposition engine evaluating IP hosts, TLDs, shorteners, Punycode, and brand spoofing.</li>
+                    <li class="mb-2">Develop sender spoofing checks detecting display-name deception and Reply-To inconsistencies.</li>
+                    <li class="mb-2">Synthesize multi-vector signals into an explainable risk scoring framework with automated PDF audit reports.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Architecture Diagram -->
+    <div class="ms-card p-4 mb-4">
+        <h5 class="text-white mb-3"><i class="fa-solid fa-diagram-project me-2 text-info"></i> End-to-End System Architecture</h5>
+        <div class="p-3 rounded bg-black border border-secondary font-monospace text-center small text-light mb-3" style="line-height: 1.8;">
+            <div class="fw-bold text-primary">[ User / Web Browser / REST API Client ]</div>
+            <div class="text-secondary">&darr; (HTTP POST / Secure Session)</div>
+            <div class="fw-bold text-info">[ Flask Application & Authentication Layer (Werkzeug / Flask-Login) ]</div>
+            <div class="text-secondary">&darr;</div>
+            <div class="fw-bold text-warning">[ RFC 822 & Form Email Parser (Headers, HTML, Plaintext, URLs, Attachments) ]</div>
+            <div class="text-secondary">&darr;</div>
+            <div class="row g-2 text-center my-2 justify-content-center">
+                <div class="col-md-2 p-2 rounded bg-dark border border-secondary text-primary"><b>1. ML NLP Vectorizer</b><br><span class="text-secondary" style="font-size: 11px;">TF-IDF + Naive Bayes</span></div>
+                <div class="col-md-2 p-2 rounded bg-dark border border-secondary text-danger"><b>2. Phishing Rules</b><br><span class="text-secondary" style="font-size: 11px;">Urgency & Credentials</span></div>
+                <div class="col-md-2 p-2 rounded bg-dark border border-secondary text-info"><b>3. URL Analyzer</b><br><span class="text-secondary" style="font-size: 11px;">IP, TLD, Punycode</span></div>
+                <div class="col-md-2 p-2 rounded bg-dark border border-secondary text-warning"><b>4. Sender Spoofing</b><br><span class="text-secondary" style="font-size: 11px;">Display Name & Domain</span></div>
+                <div class="col-md-2 p-2 rounded bg-dark border border-secondary text-success"><b>5. Header & Att.</b><br><span class="text-secondary" style="font-size: 11px;">SPF/DKIM & Extensions</span></div>
+            </div>
+            <div class="text-secondary">&darr;</div>
+            <div class="fw-bold text-danger">[ Hybrid Risk Synthesis & Decision Engine (0-100 Score & Explanations) ]</div>
+            <div class="text-secondary">&darr;</div>
+            <div class="row g-2 text-center justify-content-center">
+                <div class="col-md-4 p-2 rounded bg-dark border border-secondary text-light"><b>SQLAlchemy Database</b><br><span class="text-secondary" style="font-size: 11px;">Analyses, Indicators, Audit Logs</span></div>
+                <div class="col-md-4 p-2 rounded bg-dark border border-secondary text-light"><b>Interactive UI & PDF Generator</b><br><span class="text-secondary" style="font-size: 11px;">Chart.js, ReportLab Reports</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tech Stack Table -->
+    <div class="ms-card p-4">
+        <h5 class="text-white mb-3"><i class="fa-solid fa-layer-group me-2 text-warning"></i> Technologies & Engineering Standards</h5>
+        <div class="table-responsive">
+            <table class="table ms-table table-sm">
+                <thead>
+                    <tr>
+                        <th>Layer</th>
+                        <th>Technologies</th>
+                        <th>Role in System</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><b>Backend Framework</b></td>
+                        <td>Python 3.11+, Flask 3, Werkzeug, python-dotenv</td>
+                        <td>Modular application factory, request lifecycle, CSRF protection</td>
+                    </tr>
+                    <tr>
+                        <td><b>Machine Learning & NLP</b></td>
+                        <td>scikit-learn, pandas, numpy, joblib, nltk</td>
+                        <td>Text preprocessing, TF-IDF vectorization, probabilistic classification</td>
+                    </tr>
+                    <tr>
+                        <td><b>Data Storage & ORM</b></td>
+                        <td>SQLAlchemy, SQLite (Local Dev), PostgreSQL (Production)</td>
+                        <td>Relational schema, user authentication, analysis metrics persistence</td>
+                    </tr>
+                    <tr>
+                        <td><b>Reporting & Visualization</b></td>
+                        <td>ReportLab, Chart.js, Bootstrap 5, FontAwesome 6</td>
+                        <td>Dynamically styled PDF reports, real-time threat charts, responsive UI</td>
+                    </tr>
+                    <tr>
+                        <td><b>Security & Privacy</b></td>
+                        <td>scrypt password hashing, local static parsing, defensive sandboxing</td>
+                        <td>Guarantees no outbound connection to suspicious links or external leak</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
