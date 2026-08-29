@@ -1,3 +1,4 @@
+# MailShield Configuration — v1.0.1
 import os
 from pathlib import Path
 from dotenv import load_dotenv
